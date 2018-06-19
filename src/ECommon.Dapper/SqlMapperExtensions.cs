@@ -10,13 +10,16 @@ using Dapper;
 
 namespace ECommon.Dapper
 {
-    /// <summary>Dapper extensions.
+    /// <summary>
+    ///     Dapper extensions.
     /// </summary>
     public static class SqlMapperExtensions
     {
-        private static readonly ConcurrentDictionary<Type, List<PropertyInfo>> _paramCache = new ConcurrentDictionary<Type, List<PropertyInfo>>();
+        private static readonly ConcurrentDictionary<Type, List<PropertyInfo>> _paramCache =
+            new ConcurrentDictionary<Type, List<PropertyInfo>>();
 
-        /// <summary>Insert data into table.
+        /// <summary>
+        ///     Insert data into table.
         /// </summary>
         /// <param name="connection"></param>
         /// <param name="data"></param>
@@ -24,7 +27,8 @@ namespace ECommon.Dapper
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static long Insert(this IDbConnection connection, dynamic data, string table, IDbTransaction transaction = null, int? commandTimeout = null)
+        public static long Insert(this IDbConnection connection, dynamic data, string table,
+            IDbTransaction transaction = null, int? commandTimeout = null)
         {
             var obj = data as object;
             var properties = GetProperties(obj);
@@ -34,7 +38,9 @@ namespace ECommon.Dapper
 
             return connection.ExecuteScalar<long>(sql, obj, transaction, commandTimeout);
         }
-        /// <summary>Insert data async into table.
+
+        /// <summary>
+        ///     Insert data async into table.
         /// </summary>
         /// <param name="connection"></param>
         /// <param name="data"></param>
@@ -42,7 +48,8 @@ namespace ECommon.Dapper
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static Task<long> InsertAsync(this IDbConnection connection, dynamic data, string table, IDbTransaction transaction = null, int? commandTimeout = null)
+        public static Task<long> InsertAsync(this IDbConnection connection, dynamic data, string table,
+            IDbTransaction transaction = null, int? commandTimeout = null)
         {
             var obj = data as object;
             var properties = GetProperties(obj);
@@ -53,7 +60,8 @@ namespace ECommon.Dapper
             return connection.ExecuteScalarAsync<long>(sql, obj, transaction, commandTimeout);
         }
 
-        /// <summary>Updata data for table with a specified condition.
+        /// <summary>
+        ///     Updata data for table with a specified condition.
         /// </summary>
         /// <param name="connection"></param>
         /// <param name="data"></param>
@@ -62,7 +70,8 @@ namespace ECommon.Dapper
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static int Update(this IDbConnection connection, dynamic data, dynamic condition, string table, IDbTransaction transaction = null, int? commandTimeout = null)
+        public static int Update(this IDbConnection connection, dynamic data, dynamic condition, string table,
+            IDbTransaction transaction = null, int? commandTimeout = null)
         {
             var obj = data as object;
             var conditionObj = condition as object;
@@ -77,9 +86,7 @@ namespace ECommon.Dapper
             var whereFields = string.Empty;
 
             if (whereProperties.Any())
-            {
                 whereFields = " where " + string.Join(" and ", whereProperties.Select(p => p + " = @w_" + p));
-            }
 
             var sql = string.Format("update {0} set {1}{2}", table, updateFields, whereFields);
 
@@ -90,7 +97,9 @@ namespace ECommon.Dapper
 
             return connection.Execute(sql, parameters, transaction, commandTimeout);
         }
-        /// <summary>Updata data async for table with a specified condition.
+
+        /// <summary>
+        ///     Updata data async for table with a specified condition.
         /// </summary>
         /// <param name="connection"></param>
         /// <param name="data"></param>
@@ -99,7 +108,8 @@ namespace ECommon.Dapper
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static Task<int> UpdateAsync(this IDbConnection connection, dynamic data, dynamic condition, string table, IDbTransaction transaction = null, int? commandTimeout = null)
+        public static Task<int> UpdateAsync(this IDbConnection connection, dynamic data, dynamic condition,
+            string table, IDbTransaction transaction = null, int? commandTimeout = null)
         {
             var obj = data as object;
             var conditionObj = condition as object;
@@ -114,9 +124,7 @@ namespace ECommon.Dapper
             var whereFields = string.Empty;
 
             if (whereProperties.Any())
-            {
                 whereFields = " where " + string.Join(" and ", whereProperties.Select(p => p + " = @w_" + p));
-            }
 
             var sql = string.Format("update {0} set {1}{2}", table, updateFields, whereFields);
 
@@ -128,7 +136,8 @@ namespace ECommon.Dapper
             return connection.ExecuteAsync(sql, parameters, transaction, commandTimeout);
         }
 
-        /// <summary>Delete data from table with a specified condition.
+        /// <summary>
+        ///     Delete data from table with a specified condition.
         /// </summary>
         /// <param name="connection"></param>
         /// <param name="condition"></param>
@@ -136,21 +145,22 @@ namespace ECommon.Dapper
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static int Delete(this IDbConnection connection, dynamic condition, string table, IDbTransaction transaction = null, int? commandTimeout = null)
+        public static int Delete(this IDbConnection connection, dynamic condition, string table,
+            IDbTransaction transaction = null, int? commandTimeout = null)
         {
             var conditionObj = condition as object;
             var whereFields = string.Empty;
             var whereProperties = GetProperties(conditionObj);
             if (whereProperties.Count > 0)
-            {
                 whereFields = " where " + string.Join(" and ", whereProperties.Select(p => p + " = @" + p));
-            }
 
             var sql = string.Format("delete from {0}{1}", table, whereFields);
 
             return connection.Execute(sql, conditionObj, transaction, commandTimeout);
         }
-        /// <summary>Delete data async from table with a specified condition.
+
+        /// <summary>
+        ///     Delete data async from table with a specified condition.
         /// </summary>
         /// <param name="connection"></param>
         /// <param name="condition"></param>
@@ -158,22 +168,22 @@ namespace ECommon.Dapper
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static Task<int> DeleteAsync(this IDbConnection connection, dynamic condition, string table, IDbTransaction transaction = null, int? commandTimeout = null)
+        public static Task<int> DeleteAsync(this IDbConnection connection, dynamic condition, string table,
+            IDbTransaction transaction = null, int? commandTimeout = null)
         {
             var conditionObj = condition as object;
             var whereFields = string.Empty;
             var whereProperties = GetProperties(conditionObj);
             if (whereProperties.Count > 0)
-            {
                 whereFields = " where " + string.Join(" and ", whereProperties.Select(p => p + " = @" + p));
-            }
 
             var sql = string.Format("delete from {0}{1}", table, whereFields);
 
             return connection.ExecuteAsync(sql, conditionObj, transaction, commandTimeout);
         }
 
-        /// <summary>Get data count from table with a specified condition.
+        /// <summary>
+        ///     Get data count from table with a specified condition.
         /// </summary>
         /// <param name="connection"></param>
         /// <param name="condition"></param>
@@ -182,11 +192,14 @@ namespace ECommon.Dapper
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static int GetCount(this IDbConnection connection, object condition, string table, bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
+        public static int GetCount(this IDbConnection connection, object condition, string table, bool isOr = false,
+            IDbTransaction transaction = null, int? commandTimeout = null)
         {
             return QueryList<int>(connection, condition, table, "count(*)", isOr, transaction, commandTimeout).Single();
         }
-        /// <summary>Get data count async from table with a specified condition.
+
+        /// <summary>
+        ///     Get data count async from table with a specified condition.
         /// </summary>
         /// <param name="connection"></param>
         /// <param name="condition"></param>
@@ -195,12 +208,15 @@ namespace ECommon.Dapper
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static Task<int> GetCountAsync(this IDbConnection connection, object condition, string table, bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
+        public static Task<int> GetCountAsync(this IDbConnection connection, object condition, string table,
+            bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
         {
-            return QueryListAsync<int>(connection, condition, table, "count(*)", isOr, transaction, commandTimeout).ContinueWith<int>(t => t.Result.Single());
+            return QueryListAsync<int>(connection, condition, table, "count(*)", isOr, transaction, commandTimeout)
+                .ContinueWith(t => t.Result.Single());
         }
 
-        /// <summary>Query a list of data from table with a specified condition.
+        /// <summary>
+        ///     Query a list of data from table with a specified condition.
         /// </summary>
         /// <param name="connection"></param>
         /// <param name="condition"></param>
@@ -210,11 +226,14 @@ namespace ECommon.Dapper
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static IEnumerable<dynamic> QueryList(this IDbConnection connection, dynamic condition, string table, string columns = "*", bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
+        public static IEnumerable<dynamic> QueryList(this IDbConnection connection, dynamic condition, string table,
+            string columns = "*", bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
         {
             return QueryList<dynamic>(connection, condition, table, columns, isOr, transaction, commandTimeout);
         }
-        /// <summary>Query a list of data async from table with a specified condition.
+
+        /// <summary>
+        ///     Query a list of data async from table with a specified condition.
         /// </summary>
         /// <param name="connection"></param>
         /// <param name="condition"></param>
@@ -224,11 +243,15 @@ namespace ECommon.Dapper
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static Task<IEnumerable<dynamic>> QueryListAsync(this IDbConnection connection, dynamic condition, string table, string columns = "*", bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
+        public static Task<IEnumerable<dynamic>> QueryListAsync(this IDbConnection connection, dynamic condition,
+            string table, string columns = "*", bool isOr = false, IDbTransaction transaction = null,
+            int? commandTimeout = null)
         {
             return QueryListAsync<dynamic>(connection, condition, table, columns, isOr, transaction, commandTimeout);
         }
-        /// <summary>Query a list of data from table with specified condition.
+
+        /// <summary>
+        ///     Query a list of data from table with specified condition.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="connection"></param>
@@ -239,11 +262,15 @@ namespace ECommon.Dapper
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static IEnumerable<T> QueryList<T>(this IDbConnection connection, object condition, string table, string columns = "*", bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
+        public static IEnumerable<T> QueryList<T>(this IDbConnection connection, object condition, string table,
+            string columns = "*", bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
         {
-            return connection.Query<T>(BuildQuerySQL(condition, table, columns, isOr), condition, transaction, true, commandTimeout);
+            return connection.Query<T>(BuildQuerySQL(condition, table, columns, isOr), condition, transaction, true,
+                commandTimeout);
         }
-        /// <summary>Query a list of data async from table with specified condition.
+
+        /// <summary>
+        ///     Query a list of data async from table with specified condition.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="connection"></param>
@@ -254,47 +281,81 @@ namespace ECommon.Dapper
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static Task<IEnumerable<T>> QueryListAsync<T>(this IDbConnection connection, object condition, string table, string columns = "*", bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
+        public static Task<IEnumerable<T>> QueryListAsync<T>(this IDbConnection connection, object condition,
+            string table, string columns = "*", bool isOr = false, IDbTransaction transaction = null,
+            int? commandTimeout = null)
         {
-            return connection.QueryAsync<T>(BuildQuerySQL(condition, table, columns, isOr), condition, transaction, commandTimeout);
+            return connection.QueryAsync<T>(BuildQuerySQL(condition, table, columns, isOr), condition, transaction,
+                commandTimeout);
+        }
+
+        /// <summary>
+        ///     Query the first of data async from table with specified condition.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="condition"></param>
+        /// <param name="table"></param>
+        /// <param name="columns"></param>
+        /// <param name="isOr"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static async Task<T> QueryFirstOrDefaultAsync<T>(this IDbConnection connection, object condition,
+            string table,
+            string columns = "*", bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            return await connection.QueryFirstOrDefaultAsync<T>(BuildQuerySQL(condition, table, columns, isOr),
+                condition,
+                transaction, commandTimeout);
+        }
+
+        /// <summary>
+        ///     Query the first of data from table with specified condition.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="condition"></param>
+        /// <param name="table"></param>
+        /// <param name="columns"></param>
+        /// <param name="isOr"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static T QueryFirstOrDefault<T>(this IDbConnection connection, object condition, string table,
+            string columns = "*", bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            return connection.QueryFirstOrDefault<T>(BuildQuerySQL(condition, table, columns, isOr), condition,
+                transaction, commandTimeout);
         }
 
         private static string BuildQuerySQL(dynamic condition, string table, string selectPart = "*", bool isOr = false)
         {
             var conditionObj = condition as object;
             var properties = GetProperties(conditionObj);
-            if (properties.Count == 0)
-            {
-                return string.Format("SELECT {1} FROM {0}", table, selectPart);
-            }
+            if (properties.Count == 0) return string.Format("SELECT {1} FROM {0}", table, selectPart);
 
             var separator = isOr ? " OR " : " AND ";
             var wherePart = string.Join(separator, properties.Select(p => p + " = @" + p));
 
             return string.Format("SELECT {2} FROM {0} WHERE {1}", table, wherePart, selectPart);
         }
+
         private static List<string> GetProperties(object obj)
         {
-            if (obj == null)
-            {
-                return new List<string>();
-            }
-            if (obj is DynamicParameters)
-            {
-                return (obj as DynamicParameters).ParameterNames.ToList();
-            }
+            if (obj == null) return new List<string>();
+            if (obj is DynamicParameters) return (obj as DynamicParameters).ParameterNames.ToList();
             return GetPropertyInfos(obj).Select(x => x.Name).ToList();
         }
+
         private static List<PropertyInfo> GetPropertyInfos(object obj)
         {
-            if (obj == null)
-            {
-                return new List<PropertyInfo>();
-            }
+            if (obj == null) return new List<PropertyInfo>();
 
             List<PropertyInfo> properties;
             if (_paramCache.TryGetValue(obj.GetType(), out properties)) return properties.ToList();
-            properties = obj.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.Public).ToList();
+            properties = obj.GetType()
+                .GetProperties(BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.Public).ToList();
             _paramCache[obj.GetType()] = properties;
             return properties;
         }
